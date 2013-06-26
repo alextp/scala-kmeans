@@ -17,9 +17,9 @@ import cc.factorie.la.{DenseTensor1, Tensor1, Tensor}
  * @param k The number of clusters
  * @param d The dimensionality of the data
  */
-class ParallelKMeans(data: Seq[Tensor1], k: Int,  d: Int) {
+class ParallelKMeans(data: Seq[Tensor1], k: Int,  d: Int, initialMeans: Seq[DenseTensor1] = null) {
 
-  val means = Array.fill(k)(new DenseTensor1(d))
+  val means = Array.fill[DenseTensor1](k)(null)
   val norms = Array.fill(k)(0.0)
 
   val rng = new java.util.Random()
@@ -30,7 +30,12 @@ class ParallelKMeans(data: Seq[Tensor1], k: Int,  d: Int) {
 
   def initialize() {
     for (i <- 0 until k) {
-      means(i) += data(rng.nextInt(data.length))
+      if (initialMeans ne null)
+        means(i) = initialMeans(i)
+      else {
+        means(i) = new DenseTensor1(d)
+        means(i) += data(rng.nextInt(data.length))
+      }
       norms(i) = means(i).twoNormSquared
     }
   }
@@ -70,6 +75,14 @@ class ParallelKMeans(data: Seq[Tensor1], k: Int,  d: Int) {
 }
 
 object ParallelKMeans {
+  def goodInitialize(data: Seq[Tensor1], k: Int, d: Int, iterations: Int) = {
+    val rng = new scala.util.Random(0)
+    val initialMeans = rng.shuffle(StreamingKMeans.process(data)).take(k)
+    val km = new ParallelKMeans(data, k, d, initialMeans)
+    km.process(iterations)
+    km.means
+  }
+
   // Runs the parallel KMeans n times and returns the means of the best run
   def bestOfN(data: Seq[Tensor1], k: Int,  n: Int,  d: Int, iterations: Int) = {
     var bestKM: ParallelKMeans = null
