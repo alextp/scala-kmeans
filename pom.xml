@@ -1,0 +1,172 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cc.refectorie</groupId>
+    <artifactId>Encoding</artifactId>
+    <packaging>jar</packaging>
+    <description>Encoding</description>
+    <version>1.0-SNAPSHOT</version>
+    <name>kmeans</name>
+    <organization>
+        <name>cc.refectorie</name>
+    </organization>
+
+    <properties>
+      <scala.version>2.10.1</scala.version>
+      <scalatest.version>1.9.1</scalatest.version>
+      <junit.version>4.10</junit.version>
+    </properties>
+
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>scala-tools.org</id>
+      <name>Scala-Tools Maven2 Repository</name>
+      <url>https://oss.sonatype.org/content/groups/scala-tools</url>
+    </pluginRepository>
+  </pluginRepositories>
+  <build>
+    <sourceDirectory>src/main/scala</sourceDirectory>
+    <testSourceDirectory>src/test/scala</testSourceDirectory>
+    <plugins>
+      <!-- Adds support for building Scala -->
+      <plugin>
+        <groupId>org.scala-tools</groupId>
+        <artifactId>maven-scala-plugin</artifactId>
+        <version>2.15.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+          <configuration>
+            <recompileMode>incremental</recompileMode>
+            <scalaVersion>${scala.version}</scalaVersion>
+
+            <args>
+              <arg>-deprecation</arg>
+              <arg>-feature</arg>
+            </args>
+            <launchers>
+
+
+            </launchers>
+          </configuration>
+      </plugin>
+
+      <!-- Assembles the jar and other release formats (tarball, etc.). -->
+ <!--     <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attached</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>project</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
+-->
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <!-- During release:perform, enable the "release" profile -->
+          <releaseProfiles>release</releaseProfiles>
+          <goals>deploy package</goals>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+
+    <dependencies>  
+      <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cc.factorie</groupId>
+            <artifactId>factorie</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+  <distributionManagement>
+    <repository>
+      <id>dev-iesl.cs.umass.edu</id>
+      <name>dev-iesl.cs.umass.edu</name>
+      <url>https://dev-iesl.cs.umass.edu/nexus/content/repositories/releases</url>
+    </repository>
+
+    <snapshotRepository>
+      <id>dev-iesl.cs.umass.edu</id>
+      <name>dev-iesl.cs.umass.edu</name>
+      <url>https://dev-iesl.cs.umass.edu/nexus/content/repositories/snapshots</url>
+      <uniqueVersion>true</uniqueVersion>
+    </snapshotRepository>
+
+    <site>
+      <id>ieslwww</id>
+      <name>IESL www repository</name>
+      <url>scp://iesl.cs.umass.edu/m/iesl/data2/www/iesl/maven/factorie</url>
+    </site>
+  </distributionManagement>
+    <repositories>
+      <repository>
+	<id>sameer-releases</id>
+	<name>Sameer's repostory</name>
+	<url>https://github.com/sameersingh/maven-repo/raw/master/releases</url>
+      </repository>
+      <repository>
+	<id>sameer-snapshots</id>
+	<name>Sameer's repository</name>
+	<url>https://github.com/sameersingh/maven-repo/raw/master/snapshots</url>
+      </repository>
+      <repository>
+        <id>opennlpsfnet</id>
+        <name>opennlp.sf.net</name>
+        <url>http://opennlp.sourceforge.net/maven2/</url>
+        <layout>default</layout>
+      </repository>
+      <repository>
+        <id>IESLthirdparty</id>
+        <name>IESL third party</name>
+            <url>https://dev-iesl.cs.umass.edu/nexus/content/repositories/thirdparty/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>IESLsnapshots</id>
+            <name>IESL snapshots</name>
+            <url>https://dev-iesl.cs.umass.edu/nexus/content/repositories/snapshots/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>IESLreleases</id>
+            <name>IESL releases</name>
+            <url>https://dev-iesl.cs.umass.edu/nexus/content/repositories/releases/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>repocodahalecom</id>
+            <name>repo.codahale.com</name>
+            <url>http://repo.codahale.com/</url>
+            <layout>default</layout>
+        </repository>
+            <repository>
+      <id>scala-tools.org</id>
+      <name>Scala-Tools Maven2 Repository</name>
+      <url>https://oss.sonatype.org/content/groups/scala-tools</url>
+    </repository>
+    </repositories>
+</project>
