@@ -1,6 +1,6 @@
 package cc.refectorie.Encoding
 
-import java.io.{FileWriter, BufferedWriter}
+import cc.factorie.la.{DenseTensor1, Tensor}
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,40 +11,33 @@ import java.io.{FileWriter, BufferedWriter}
  */
 
 object StreamingKMeans {
-  val beta = 10.0
 
-  def dot(a: Array[(Int, Double)], b: Array[(Int, Double)]): Double = {
-    var dot = 0.0
-    var i = 0
-    var j = 0
-    while((i < a.length) && (j < b.length)) {
-      if (a(i)._1 == b(j)._1) {
-        dot += a(i)._2 * b(j)._2
-        i += 1
-        j += 1
-      } else if (a(i)._1 < b(j)._1) {
-        i += 1
-      } else {
-        j += 1
-      }
-    }
-    dot
-  }
-
-  def process(data: Array[Array[(Int, Double)]], k: Int,  d: Int, kappa: Int = 0, weights: Array[Double] = null) = {
-    val centers = collection.mutable.ArrayBuffer[Array[(Int,  Double)]]()
-    val kp = if (kappa > 0) kappa else 10*k*Math.log(data.length)
-    val ws = if (weights != null) weights else Array.ofDim[Int](data.length)
-    var f = 1.0/(k*(1.0+ Math.log(data.length)))
+  /**
+   * Does a streaming clustering algorithm. Each point is processed
+   * in turn, and added to the best cluster with a probability proportional
+   * to its distance.
+   * @param data The points to be clustered
+   * @param f If more than 1, less clusters are formed, if less than 1, more clusters
+   * @return The cluster centers found
+   */
+  def process(data: Seq[Tensor], f: Double = 1.0) = {
+    val centers = collection.mutable.ArrayBuffer[(Tensor,Double)]()
+    val n0 = new DenseTensor1(data(0).length)
+    n0 += data(0)
+    centers.append((n0,1))
     val rng = new util.Random()
     var i = 1
-    centers.append(data(0))
     while (i < data.length) {
-      //if (centers.length < kp) {
       val x = data(i)
-      val dist = 2.0 - 2*centers.par.map(c => dot(x, c)).max
-      if (rng.nextDouble() < dist/(centers.length)) {
-        centers.append(x)
+      val (dist, bestI) = centers.zipWithIndex.par.map({ case ((t,s),idx) => (2.0 - 2*t.dot(x)/s,idx)}).maxBy(_._1)
+      if (rng.nextDouble() < f*dist/centers.length) {
+        val n = new DenseTensor1(x.length)
+        n += x
+        centers.append((n,1.0))
+      } else {
+        val (t,d) = centers(bestI)
+        t += x
+        centers(bestI) = (t,d+1)
       }
       i += 1
       if (i % 1000 == 0) {
@@ -52,7 +45,7 @@ object StreamingKMeans {
       }
     }
 
-    centers
+    centers.map({ case (t,d) => t /= d; t})
   }
 
 
